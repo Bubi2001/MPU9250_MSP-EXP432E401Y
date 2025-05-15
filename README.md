@@ -1,0 +1,2 @@
+# MPU9250_MSP-EXP432E401Y
+I2C Driver for library for the IMU MPU9250 using an MSP-EXP432E401Y
