@@ -31,6 +31,7 @@
 
 /**
  * @brief Resets the MPU9250 by power cycling.
+ * @note Uses PWRIMU function and assumes PWR_MPU9250 GPIO is configured.
  * Includes console output during reset.
  */
 void RSTIMU(void) {
@@ -51,6 +52,7 @@ void RSTIMU(void) {
 /**
  * @brief Controls the power supply to the MPU9250 via GPIO.
  * @param pwr Boolean indicating desired power state (true = ON, false = OFF). [in]
+ * @note Assumes PWR_MPU9250 is defined and configured as a GPIO output.
  */
 void PWRIMU(bool pwr) {
     // Write the GPIO pin state: 1 for true (ON), 0 for false (OFF)
@@ -83,7 +85,7 @@ void MPU9250_init(I2C_Handle i2c, I2C_Transaction *i2cTransaction, IMUData *IMU_
     MPU9250_writeReg(i2c, i2cTransaction, MPU9250_PWR_MGMT_1_ADDR, 0x81);
 
     // Delay needed after reset before registers are accessible reliably
-    // ! TODO: Add appropriate delay (e.g., Task_sleep(100) for 100ms if in Task context)
+    Task_sleep(100);
 
     // Verify device identity by reading WHO_AM_I register
     uint8_t who_am_i_read;
@@ -105,32 +107,29 @@ void MPU9250_init(I2C_Handle i2c, I2C_Transaction *i2cTransaction, IMUData *IMU_
     // Refer to MPU9250 Register Map datasheet for details on these values
 
     // CONFIG Register (0x1A): DLPF_CFG = 3 (Accel BW: 41Hz, Gyro BW: 42Hz), FIFO_MODE=0 (overwrite)
-    // MPU9250_writeReg(i2c, i2cTransaction, MPU9250_CONFIG_ADDR, 0x03); // Value was 0x43, maybe includes reserved bits? Using 0x03 for DLPF=3.
     MPU9250_writeReg(i2c, i2cTransaction, MPU9250_CONFIG_ADDR, 0x43);
 
     // GYRO_CONFIG Register (0x1B): FS_SEL = 1 (+/- 500 dps), FCHOICE_B = 0 (use DLPF)
-    // Self Test bits = 0. Note: Value 0xEB provided in original code seems unusual.
-    // Using 0x08 for +/- 500 dps as assumed by unit conversion.
-    MPU9250_writeReg(i2c, i2cTransaction, MPU9250_GYRO_CONFIG_ADDR, 0x08); // Original: 0xEB
+    // Using 0x08 for +/- 500 dps.
+    MPU9250_writeReg(i2c, i2cTransaction, MPU9250_GYRO_CONFIG_ADDR, 0x08);
 
     // ACCEL_CONFIG Register (0x1C): ACCEL_FS_SEL = 1 (+/- 4g)
-    // Self Test bits = 0. Note: Value 0xE8 provided in original code seems unusual.
-    // Using 0x08 for +/- 4g as assumed by unit conversion.
-    MPU9250_writeReg(i2c, i2cTransaction, MPU9250_ACCEL_CONFIG_ADDR, 0x08); // Original: 0xE8
+    // Using 0x08 for +/- 4g.
+    MPU9250_writeReg(i2c, i2cTransaction, MPU9250_ACCEL_CONFIG_ADDR, 0x08);
 
     // ACCEL_CONFIG_2 Register (0x1D): ACCEL_FCHOICE_B = 0 (use DLPF), A_DLPFCFG = 3 (BW: 41Hz)
     MPU9250_writeReg(i2c, i2cTransaction, MPU9250_ACCEL_CONFIG_2_ADDR, 0x03);
 
     // FIFO_EN Register (0x23): Enable Temp, Gyro X/Y/Z, Accel X/Y/Z to be written to FIFO
     // 0xF8 = TEMP_EN | GYRO_X_EN | GYRO_Y_EN | GYRO_Z_EN | ACCEL_EN
-    MPU9250_writeReg(i2c, i2cTransaction, MPU9250_FIFO_EN_ADDR, 0xF8); // Original: 0xF7 (included SLV0?)
+    MPU9250_writeReg(i2c, i2cTransaction, MPU9250_FIFO_EN_ADDR, 0xF8);
 
     // INT_PIN_CFG Register (0x37): BYPASS_EN = 1 (Enable bypass mux to access magnetometer AK8963 if needed)
-    MPU9250_writeReg(i2c, i2cTransaction, MPU9250_INT_PIN_CFG_ADDR, 0x02); // Original: 0x10 (FSYNC related?) Using 0x02 for simple bypass.
+    MPU9250_writeReg(i2c, i2cTransaction, MPU9250_INT_PIN_CFG_ADDR, 0x02);
 
     // USER_CTRL Register (0x6A): FIFO_EN = 1 (Enable FIFO buffer), Reset FIFO, I2C Master disabled
     // 0x44 = FIFO_EN | FIFO_RESET
-    MPU9250_writeReg(i2c, i2cTransaction, MPU9250_USER_CTRL_ADDR, 0x44); // Original: 0x77 (Included I2C_MST_RST, SIG_COND_RESET?)
+    MPU9250_writeReg(i2c, i2cTransaction, MPU9250_USER_CTRL_ADDR, 0x44);
 
     System_printf("MPU9250 Initialization complete.\n");
     System_flush();
@@ -287,24 +286,17 @@ void MPU9250_unitConversion(uint8_t *raw, IMUData *IMU_Handle, Vector3D biasVect
     accelRawFloat[1] = (float)rawAccelY_LSB;
     accelRawFloat[2] = (float)rawAccelZ_LSB;
 
-    // 1. Subtract Bias (LSB)
+    // Subtract Bias (LSB)
     float accelBiasCorrected[3];
-    accelBiasCorrected[0] = accelRawFloat[0] - imuCalibration.biasVector.x;
-    accelBiasCorrected[1] = accelRawFloat[1] - imuCalibration.biasVector.y;
-    accelBiasCorrected[2] = accelRawFloat[2] - imuCalibration.biasVector.z;
+    accelBiasCorrected[0] = accelRawFloat[0] - biasVector.x;
+    accelBiasCorrected[1] = accelRawFloat[1] - biasVector.y;
+    accelBiasCorrected[2] = accelRawFloat[2] - biasVector.z;
 
-    // 2. Apply Calibration Matrix M_cal: Accel_cal_mps2 = ACCEL_M_CAL * accelBiasCorrected
-    IMU_Handle->accelerometer.x = imuCalibration.mCal.m1.x * accelBiasCorrected[0] +
-                                  imuCalibration.mCal.m1.y * accelBiasCorrected[1] +
-                                  imuCalibration.mCal.m1.z * accelBiasCorrected[2];
-
-    IMU_Handle->accelerometer.y = imuCalibration.mCal.m2.x * accelBiasCorrected[0] +
-                                  imuCalibration.mCal.m2.y * accelBiasCorrected[1] +
-                                  imuCalibration.mCal.m2.z * accelBiasCorrected[2];
-
-    IMU_Handle->accelerometer.z = imuCalibration.mCal.m3.x * accelBiasCorrected[0] +
-                                  imuCalibration.mCal.m3.y * accelBiasCorrected[1] +
-                                  imuCalibration.mCal.m3.z * accelBiasCorrected[2];
+    // Convert raw ADC values to physical units (m/s^2)
+    // Assumes +/- 4g range (Sensitivity = 32768 / 2 = 16384 LSB/g)
+    IMU_Handle->accelerometer.x = ((float)rawAccelX / 16384.0f) * G_MPS2;
+    IMU_Handle->accelerometer.y = ((float)rawAccelY / 16384.0f) * G_MPS2;
+    IMU_Handle->accelerometer.z = ((float)rawAccelZ / 16384.0f) * G_MPS2;
 
     // --- Temperature Conversion ---
     // Combine high and low bytes into 16-bit signed integer
@@ -325,7 +317,7 @@ void MPU9250_unitConversion(uint8_t *raw, IMUData *IMU_Handle, Vector3D biasVect
     // Assumes +/- 500 dps range (Sensitivity = 32768 / 500 = 65.536 LSB/dps ~ 65.5)
     // Convert dps to rad/s by dividing by RAD_TO_DEG (or multiplying by DEG_TO_RAD)
     float gyroSensitivity = 65.5f; // LSB/(deg/s)
-    IMU_Handle->gyroscope.x = ((float)rawGyroX / gyroSensitivity) / RAD_TO_DEG; // Convert LSB to deg/s, then deg/s to rad/s
-    IMU_Handle->gyroscope.y = ((float)rawGyroY / gyroSensitivity) / RAD_TO_DEG;
-    IMU_Handle->gyroscope.z = ((float)rawGyroZ / gyroSensitivity) / RAD_TO_DEG;
+    IMU_Handle->gyroscope.x = ((float)rawGyroX / gyroSensitivity) * DEG_TO_RAD; // Convert LSB to deg/s, then deg/s to rad/s
+    IMU_Handle->gyroscope.y = ((float)rawGyroY / gyroSensitivity) * DEG_TO_RAD;
+    IMU_Handle->gyroscope.z = ((float)rawGyroZ / gyroSensitivity) * DEG_TO_RAD;
 }

@@ -150,6 +150,7 @@
 // --- Physical Constants ---
 #define G_MPS2          9.80665f
 #define RAD_TO_DEG      57.2957795f
+#define DEG_TO_RED      0.01745329f
 
 /**
  * @brief Structure to represent a 3-dimensional vector.
@@ -190,7 +191,6 @@ void PWRIMU(bool pwr);
  * @param i2cTransaction Pointer to an I2C transaction structure (used internally). [in, out]
  * @note Performs a device reset, checks WHO_AM_I, and configures various registers
  * (Gyro/Accel ranges, DLPF, FIFO, etc.). Halts system on WHO_AM_I mismatch or I2C error.
- * Assumes specific configuration values are desired (see implementation).
  */
 void MPU9250_init(I2C_Handle i2c, I2C_Transaction *i2cTransaction, IMUData *IMU_Handle);
 
@@ -231,7 +231,7 @@ void MPU9250_readAccTempGyr(I2C_Handle i2c, I2C_Transaction *i2cTransaction, uin
  * Order: AX_H, AX_L, AY_H, AY_L, AZ_H, AZ_L, T_H, T_L, GX_H, GX_L, GY_H, GY_L, GZ_H, GZ_L
  * @param IMU_Handle Pointer to the IMUData structure where the converted engineering unit
  * data (accelerometer [m/s^2], temperature [°C], gyroscope [rad/s]) will be stored. [out]
- * @param imuCalibration Structure containing the accelerometer bias vector and calibration matrix. [in]
+ * @param biasVector Structure containing the accelerometer bias vector. [in]
  * @return IMUData structure containing converted accelerometer (m/s^2),
  * temperature (°C), and gyroscope (rad/s) data.
  * @note See header file documentation for assumptions on sensitivity settings.
@@ -239,6 +239,6 @@ void MPU9250_readAccTempGyr(I2C_Handle i2c, I2C_Transaction *i2cTransaction, uin
  * The return type in the original comment seems to be a leftover, as the function is void
  * and uses the IMU_Handle pointer to return data.
  */
-void MPU9250_unitConversion(uint8_t *raw, IMUData *IMU_Handle, CalibrationData imuCalibration);
+void MPU9250_unitConversion(uint8_t *raw, IMUData *IMU_Handle, Vector3D biasVector);
 
 #endif // MPU9250_H
