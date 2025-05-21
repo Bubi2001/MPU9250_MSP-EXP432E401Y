@@ -294,9 +294,9 @@ void MPU9250_unitConversion(uint8_t *raw, IMUData *IMU_Handle, Vector3D biasVect
 
     // Convert raw ADC values to physical units (m/s^2)
     // Assumes +/- 4g range (Sensitivity = 32768 / 2 = 16384 LSB/g)
-    IMU_Handle->accelerometer.x = ((float)rawAccelX / 16384.0f) * G_MPS2;
-    IMU_Handle->accelerometer.y = ((float)rawAccelY / 16384.0f) * G_MPS2;
-    IMU_Handle->accelerometer.z = ((float)rawAccelZ / 16384.0f) * G_MPS2;
+    IMU_Handle->accelerometer.x = ((float)accelBiasCorrected[0] / 16384.0f) * G_MPS2;
+    IMU_Handle->accelerometer.y = ((float)accelBiasCorrected[1] / 16384.0f) * G_MPS2;
+    IMU_Handle->accelerometer.z = ((float)accelBiasCorrected[2] / 16384.0f) * G_MPS2;
 
     // --- Temperature Conversion ---
     // Combine high and low bytes into 16-bit signed integer
