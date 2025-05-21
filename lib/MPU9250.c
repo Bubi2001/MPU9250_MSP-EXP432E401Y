@@ -1,19 +1,19 @@
 // ================================================================================
-// 
+//
 // File Name           : MPU9250.c
 // Project Name        : LSE2
 // Target Devices      : MSP-EXP432E401Y
-// Description         : 
+// Description         :
 //     Source code file for MPU9250 IMU sensor driver
 //      defines constants, register maps, function prototypes, and hardware drivers
 //      for interacting via I2C and a GPIO on TI-RTOS
-// 
+//
 // Author              : Adrià Babiano Novella
 // Last Modified       : May 2025
 //
 // ================================================================================
 //
-// * The GPL license allows free distribution and modification of the software, 
+// * The GPL license allows free distribution and modification of the software,
 // * as long as the same license is maintained in derivative versions.
 //
 // ================================================================================
@@ -113,8 +113,8 @@ void MPU9250_init(I2C_Handle i2c, I2C_Transaction *i2cTransaction, IMUData *IMU_
     // Using 0x08 for +/- 500 dps.
     MPU9250_writeReg(i2c, i2cTransaction, MPU9250_GYRO_CONFIG_ADDR, 0x08);
 
-    // ACCEL_CONFIG Register (0x1C): ACCEL_FS_SEL = 1 (+/- 2g)
-    // Using 0x08 for +/- 2g.
+    // ACCEL_CONFIG Register (0x1C): ACCEL_FS_SEL = 0 (+/- 2g)
+    // Using 0x00 for +/- 2g.
     MPU9250_writeReg(i2c, i2cTransaction, MPU9250_ACCEL_CONFIG_ADDR, 0x00);
 
     // ACCEL_CONFIG_2 Register (0x1D): ACCEL_FCHOICE_B = 0 (use DLPF), A_DLPFCFG = 3 (BW: 41Hz)

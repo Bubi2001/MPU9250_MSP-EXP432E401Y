@@ -1,19 +1,19 @@
 // ================================================================================
-// 
+//
 // File Name           : MPU9250.h
 // Project Name        : LSE2
 // Target Devices      : MSP-EXP432E401Y
-// Description         : 
+// Description         :
 //     Header file for MPU9250 IMU sensor driver
 //      defines constants, register maps, function prototypes, and hardware drivers
 //      for interacting via I2C and a GPIO on TI-RTOS
-// 
+//
 // Author              : Adrià Babiano Novella
 // Last Modifed        : May 2025
 //
 // ================================================================================
 //
-// * The GPL license allows free distribution and modification of the software, 
+// * The GPL license allows free distribution and modification of the software,
 // * as long as the same license is maintained in derivative versions.
 //
 // ================================================================================
@@ -35,6 +35,8 @@
 
 #include <ti/drivers/I2C.h>
 #include <ti/drivers/GPIO.h>
+
+#include <ti/sysbios/knl/Task.h>
 
 #include "ti_drivers_config.h"
 
@@ -150,7 +152,7 @@
 // --- Physical Constants ---
 #define G_MPS2          9.80665f
 #define RAD_TO_DEG      57.2957795f
-#define DEG_TO_RED      0.01745329f
+#define DEG_TO_RAD      0.01745329f
 
 /**
  * @brief Structure to represent a 3-dimensional vector.
