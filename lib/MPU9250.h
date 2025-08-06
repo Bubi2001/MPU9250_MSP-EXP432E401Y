@@ -1,21 +1,22 @@
 // ================================================================================
-//
+// 
 // File Name           : MPU9250.h
 // Project Name        : LSE2
 // Target Devices      : MSP-EXP432E401Y
-// Description         :
+// Description         : 
 //     Header file for MPU9250 IMU sensor driver
 //      defines constants, register maps, function prototypes, and hardware drivers
 //      for interacting via I2C and a GPIO on TI-RTOS
-//
+// 
 // Author              : Adrià Babiano Novella
-// Last Modifed        : May 2025
-//
-// ================================================================================
-//
-// * The GPL license allows free distribution and modification of the software,
-// * as long as the same license is maintained in derivative versions.
-//
+// Create Date         : 2024-12-01
+// Revision            : v1.4
+// Revision history:
+//   v1.0 - Initial Version
+//   v1.1 - Modified initialisation values
+//   v1.2 - Added custom data types
+//   v1.3 - Added comments Doxygen Style
+//   v1.4 - Added calibration
 // ================================================================================
 
 /**
@@ -33,19 +34,21 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "../LSE2_types.h"  
+
 #include <ti/drivers/I2C.h>
 #include <ti/drivers/GPIO.h>
-
-#include <ti/sysbios/knl/Task.h>
 
 #include "ti_drivers_config.h"
 
 #include <xdc/runtime/System.h>
 
+#include <ti/sysbios/knl/Task.h>
+
 // --- Constants ---
 // --- Device Specific ---
 #define MPU9250_I2C_ADDR            0x68
-#define MPU9250_WHO_AM_I            0x71
+#define MPU9250_WHO_AM_I            0x70
 
 // --- Register Addresses (MPU9250 Gyro/Accel) ---
 #define MPU9250_SELF_TEST_X_GYRO_ADDR   0x00
@@ -152,25 +155,7 @@
 // --- Physical Constants ---
 #define G_MPS2          9.80665f
 #define RAD_TO_DEG      57.2957795f
-#define DEG_TO_RAD      0.01745329f
-
-/**
- * @brief Structure to represent a 3-dimensional vector.
- */
-typedef struct Vector3D {
-    float x;    /**< X-component */
-    float y;    /**< Y-component */
-    float z;    /**< Z-component */
-} Vector3D;
-
-/**
- * @brief Structure to hold data from an Inertial Measurement Unit (IMU).
- */
-typedef struct IMUData {
-    Vector3D accelerometer; /**< Acceleration vector in m/s^2 */
-    Vector3D gyroscope;     /**< Angular velocity vector in rad/s */
-    float temperature;      /**< Temperature reading in Celsius */
-} IMUData;
+#define DEG_TO_RAD      1.0f/RAD_TO_DEG
 
 // --- Function Prototypes ---
 /**
@@ -193,6 +178,7 @@ void PWRIMU(bool pwr);
  * @param i2cTransaction Pointer to an I2C transaction structure (used internally). [in, out]
  * @note Performs a device reset, checks WHO_AM_I, and configures various registers
  * (Gyro/Accel ranges, DLPF, FIFO, etc.). Halts system on WHO_AM_I mismatch or I2C error.
+ * Assumes specific configuration values are desired (see implementation).
  */
 void MPU9250_init(I2C_Handle i2c, I2C_Transaction *i2cTransaction, IMUData *IMU_Handle);
 
@@ -228,19 +214,43 @@ void MPU9250_readReg(I2C_Handle i2c, I2C_Transaction *i2cTransaction, uint8_t re
 void MPU9250_readAccTempGyr(I2C_Handle i2c, I2C_Transaction *i2cTransaction, uint8_t *dataRx);
 
 /**
- * @brief Converts raw sensor data (14 bytes) into engineering units.
- * @param raw Pointer to the 14-byte buffer containing raw sensor data read from the IMU. [in]
- * Order: AX_H, AX_L, AY_H, AY_L, AZ_H, AZ_L, T_H, T_L, GX_H, GX_L, GY_H, GY_L, GZ_H, GZ_L
- * @param IMU_Handle Pointer to the IMUData structure where the converted engineering unit
- * data (accelerometer [m/s^2], temperature [°C], gyroscope [rad/s]) will be stored. [out]
- * @param biasVector Structure containing the accelerometer bias vector. [in]
- * @return IMUData structure containing converted accelerometer (m/s^2),
- * temperature (°C), and gyroscope (rad/s) data.
- * @note See header file documentation for assumptions on sensitivity settings.
- * The function populates the IMUData structure pointed to by IMU_Handle.
- * The return type in the original comment seems to be a leftover, as the function is void
- * and uses the IMU_Handle pointer to return data.
+ * @brief Converts raw sensor data (14 bytes) into engineering units with bias correction.
+ *
+ * This function takes the raw 16-bit ADC values from the sensor, subtracts the
+ * pre-calculated bias offsets for both the accelerometer and gyroscope, and then
+ * converts the corrected values into standard physical units (m/s^2 and rad/s).
+ *
+ * @param raw Pointer to the 14-byte buffer containing raw sensor data from the IMU. [in]
+ * @param IMU_Handle Pointer to the IMUData structure where the converted data will be stored. [out]
+ * @param accelBias Structure containing the accelerometer bias values (in LSB) to subtract. [in]
+ * @param gyroBias Structure containing the gyroscope bias values (in LSB) to subtract. [in]
  */
-void MPU9250_unitConversion(uint8_t *raw, IMUData *IMU_Handle, Vector3D biasVector);
+void MPU9250_unitConversion(uint8_t *raw, IMUData *IMU_Handle, Vector3D accelBias, Vector3D gyroBias);
+
+/**
+ * @brief Calculates roll, pitch, and yaw angles from IMU data using a complementary filter.
+ * @details
+ * This function processes raw accelerometer and gyroscope data to compute the orientation
+ * of the IMU in terms of Euler angles (roll, pitch, and yaw).
+ * * It performs the following steps:
+ * 1.  Applies a digital low-pass filter (DLPF) to the raw gyroscope readings to reduce noise.
+ * 2.  Calculates the roll and pitch angles from the accelerometer data. These are accurate
+ * for long-term orientation but noisy in the short term.
+ * 3.  Integrates the filtered gyroscope data to get an estimate of the change in angle. This is
+ * accurate for short-term changes but drifts over time.
+ * 4.  A complementary filter is used to fuse the accelerometer angles (low-pass) and integrated
+ * gyroscope angles (high-pass) for stable and accurate roll and pitch estimations.
+ * 5.  The yaw angle is calculated by integrating the z-axis gyroscope data. Note that this
+ * is not corrected by the accelerometer and will drift over time. A magnetometer would be
+ * needed for absolute yaw correction.
+ * @param[in] IMU_Handle Pointer to the IMUData struct containing the latest accelerometer and gyroscope readings.
+ * @param[in,out] anglesDegrees Pointer to the EulerAngles struct to store the calculated angles in degrees. The previous values are used as part of the integration step.
+ * @param[in] dt The time delta in seconds since the last function call (i.e., the sampling period).
+ * @param[in] cf_alpha The complementary filter coefficient, typically close to 1 (e.g., 0.98). It balances the contribution between the gyroscope and accelerometer.
+ * - `cf_alpha` -> 1.0: Trust gyroscope more (faster response, more drift).
+ * - `cf_alpha` -> 0.0: Trust accelerometer more (slower response, less drift).
+ * @param[in] dlpf_alpha The coefficient for the gyroscope's digital low-pass filter. A smaller value provides more smoothing but adds latency.
+ */
+void MPU9250_calculateAngle(IMUData *IMU_Handle, EulerAngles *anglesDegrees, float dt, float cf_alpha, float dlpf_alpha);
 
 #endif // MPU9250_H
