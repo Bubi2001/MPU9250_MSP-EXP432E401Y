@@ -33,8 +33,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "../LSE2_types.h"  
-
 #include <ti/drivers/I2C.h>
 #include <ti/drivers/GPIO.h>
 
