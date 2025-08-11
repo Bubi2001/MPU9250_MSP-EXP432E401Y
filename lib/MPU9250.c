@@ -1,7 +1,6 @@
 // ================================================================================
 // 
 // File Name           : MPU9250.c
-// Project Name        : LSE2
 // Target Devices      : MSP-EXP432E401Y
 // Description         : 
 //     Source code file for MPU9250 IMU sensor driver
@@ -112,7 +111,6 @@ void MPU9250_init(I2C_Handle i2c, I2C_Transaction *i2cTransaction, IMUData *IMU_
     // Refer to MPU9250 Register Map datasheet for details on these values
 
     // CONFIG Register (0x1A): DLPF_CFG = 3 (Accel BW: 41Hz, Gyro BW: 42Hz), FIFO_MODE=0 (overwrite)
-    // MPU9250_writeReg(i2c, i2cTransaction, MPU9250_CONFIG_ADDR, 0x03); // Value was 0x43, maybe includes reserved bits? Using 0x03 for DLPF=3.
     MPU9250_writeReg(i2c, i2cTransaction, MPU9250_CONFIG_ADDR, 0x02);
 
     // GYRO_CONFIG Register (0x1B): FS_SEL = 1 (+/- 500 dps), FCHOICE_B = 0 (use DLPF)

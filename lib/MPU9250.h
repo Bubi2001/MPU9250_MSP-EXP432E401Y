@@ -1,7 +1,6 @@
 // ================================================================================
 // 
 // File Name           : MPU9250.h
-// Project Name        : LSE2
 // Target Devices      : MSP-EXP432E401Y
 // Description         : 
 //     Header file for MPU9250 IMU sensor driver
@@ -156,6 +155,35 @@
 #define G_MPS2          9.80665f
 #define RAD_TO_DEG      57.2957795f
 #define DEG_TO_RAD      1.0f/RAD_TO_DEG
+
+// --- Custom Data Types ---
+/**
+ * @brief Structure to represent a 3-dimensional vector.
+ */
+typedef struct Vector3D {
+    float x;    /**< X-component */
+    float y;    /**< Y-component */
+    float z;    /**< Z-component */
+} Vector3D;
+
+/**
+ * @brief Structure to represent Euler angles (pitch, roll, yaw).
+ */
+typedef struct EulerAngles {
+    float pitch;    /**< Rotation around the Y-axis */
+    float roll;     /**< Rotation around the X-axis */
+    float yaw;      /**< Rotation around the Z-axis */
+} EulerAngles;
+
+/**
+  * @brief Structure to hold data from an Inertial Measurement Unit (IMU).
+  */
+typedef struct IMUData {
+    Vector3D accelerometer; /**< Acceleration vector in m/s^2 */
+    Vector3D gyroscope;     /**< Angular velocity vector in rad/s */
+    float temperature;      /**< Temperature reading in Celsius */
+} IMUData;
+
 
 // --- Function Prototypes ---
 /**
