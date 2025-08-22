@@ -1,15 +1,24 @@
 site_name: MPU-9250 TI-RTOS Driver
 site_description: A comprehensive C/C++ driver for the MPU-9250 on the TI-RTOS platform.
-
 docs_dir: doc
-
 theme:
   name: material
-  palette:
-    primary: indigo
   features:
     - navigation.tabs
     - navigation.top
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: blue
+      toggle:
+        icon: material/brightness-7 
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: light-blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
 
 nav:
   - 'Home': 'index.md'
