@@ -1,0 +1,19 @@
+name: C/C++ Build & Lint
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  lint:
+    name: 🔬 Static Analysis (Lint)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Cppcheck
+        run: sudo apt-get update && sudo apt-get install -y cppcheck
+      - name: Run Cppcheck
+        run: cppcheck --enable=all --error-exitcode=1 lib/
