@@ -1,7 +1,6 @@
 # MPU-9250 Driver for TI-RTOS
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![C/C++ CI](https://github.com/Bubi2001/MPU9250_MSP-EXP432E401Y/actions/workflows/build_and_lint.yml/badge.svg?branch=main)](https://github.com/Bubi2001/MPU9250_MSP-EXP432E401Y/actions/workflows/build_and_lint.yml)
 
 A comprehensive, easy-to-use I2C driver for the MPU-9250 IMU, specifically tailored for the **TI-RTOS** environment on the **MSP-EXP432E401Y** platform. This library offers multiple levels of abstraction to get you up and running quickly.
 
