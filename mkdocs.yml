@@ -25,4 +25,3 @@ nav:
   - 'API Reference':
     - 'Base C Library': 'api/c_library.md'
     - 'C++ DMP Class': 'api/cpp_class.md'
-    - 'C-Compatible Wrapper': 'api/c_wrapper.md'

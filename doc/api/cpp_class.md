@@ -1,197 +1,178 @@
-# MPU9250_DMP C++ Class API Reference
+# MPU6500/9250 DMP Driver API Reference
 
-## 1. Overview
+This document provides an API reference for the `MPU_DMP` driver, which interfaces with the InvenSense MPU6500/9250 sensors and their embedded Digital Motion Processor (DMP). The library is written in C++ and includes a C-compatible wrapper for use in C projects.
 
-This document provides the API reference for the `MPU9250_DMP` C++ class. This class serves as a high-level wrapper around the InvenSense Motion Driver 6.12, abstracting the underlying C functions into a clean, object-oriented interface.
+## C++ API (`MPU_DMP` Class)
 
-The primary goal of this class is to simplify the integration of the MPU9250's Digital Motion Processor (DMP) into a C++ project, particularly within the TI-RTOS environment. It manages the driver's state, handles data retrieval and parsing, and provides convenient methods for data conversion and calculation.
-
-## 2. Class Definition
+This is the object-oriented interface for C++ applications.
 
 ### Public Data Members
 
-The class exposes public member variables to store the latest sensor data retrieved from the DMP. After a successful call to `dmpUpdateFifo()`, these variables are populated with the new data.
+Once `dmpUpdateFifo()` is called, the following public members are updated with the latest sensor data.
 
-* **Raw Sensor Data:**
-  * `int ax, ay, az`: Raw accelerometer data.
-  * `int gx, gy, gz`: Raw gyroscope data (calibrated if the feature is enabled).
-  * `long qw, qx, qy, qz`: Raw quaternion data from the DMP in Q30 format.
-* **Calculated Data:**
-  * `float pitch, roll, yaw`: Calculated Euler angles in degrees. These are populated by calling `computeEulerAngles()`.
-* **Metadata:**
-  * `unsigned long time`: Timestamp (in milliseconds) of the last FIFO packet.
+| **Member** | **Type** | **Description** |
+| --- | --- | --- |
+| `ax`,`ay`,`az` | `int` | Raw accelerometer data for X, Y, and Z axes. |
+| `gx`,`gy`,`gz` | `int` | Raw gyroscope data for X, Y, and Z axes. |
+| `qw`,`qx`,`qy`,`qz` | `long` | Raw quaternion data (W, X, Y, Z) in Q30 format from the DMP. |
+| `temperature` | `long` | Raw temperature data from the sensor. |
+| `time` | `unsigned long` | Timestamp for the last sensor data update (from DMP). |
+| `pitch`,`roll`,`yaw` | `float` | Calculated Euler angles. Updated by calling `computeEulerAngles()`. |
+| `mx`,`my`,`mz` | `int` | **(MPU9250 only)**Raw magnetometer data for X, Y, and Z axes. |
+| `heading` | `float` | **(MPU9250 only)**Calculated compass heading. Updated by `computeCompassHeading()`. |
 
 ### Constructor
 
-#### `MPU9250_DMP()`
+`MPU_DMP()`
+:   Constructs a new `MPU_DMP` object.
 
-The default constructor initializes the class.
+### Basic Communication & Initialization
 
-```cpp
-MPU9250_DMP();
-```
+`int begin()`
+:   Initializes the MPU sensor and the underlying driver.
 
-## 3. Method Reference
+* Returns: `INV_SUCCESS` (0) on success, `INV_ERROR` (-1) on failure.
 
-### Initialization & Basic Control
+`int selfTest()`
+:   Runs the built-in self-test routine.
 
-#### `begin`
+* Returns: A bitmask of test results. For MPU6500, a value of `0x03` means all sensors passed. For MPU9250, `0x07` means all passed.
 
-Initializes the MPU-9250 hardware and the underlying C-driver. It sets the default sensor configuration (Gyro and Accel enabled) and prepares the device for use.
+### Sensor Configuration
 
-```cpp
-int begin();
-```
+`int setSensors(unsigned char sensors)`
+:   Enables or disables specific sensors using a bitmask (e.g., `INV_XYZ_GYRO | INV_XYZ_ACCEL`).
 
-* **Returns:** `INV_SUCCESS` (0) on success, or `INV_ERROR` (-1) on failure.
+`int setGyroFSR(unsigned short fsr)`
+:   Sets the gyroscope's full-scale range (dps). Valid values: 250, 500, 1000, 2000.
 
-#### `selfTest`
+`int setAccelFSR(unsigned char fsr)`
+:   Sets the accelerometer's full-scale range (g's). Valid values: 2, 4, 8, 16.
 
-Runs the built-in self-test routine to verify the functionality of the gyroscope, accelerometer, and magnetometer.
+`int setLPF(unsigned short lpf)`
+:   Sets the digital low-pass filter cutoff frequency (Hz). Valid values: 5, 10, 20, 42, 98, 188.
 
-```cpp
-int selfTest();
-```
+`int setSampleRate(unsigned short rate)`
+:   Sets the sensor sample rate in Hz.
 
-* **Returns:** A bitmask of test results. A value of `0x07` indicates that all three sensors passed.
-  * **Bit 0: Gyro**
-  * **Bit 1: Accel**
-  * **Bit 2: Compass**
+`unsigned short getGyroFSR()`
+:   Gets the current gyroscope full-scale range.
+
+`unsigned char getAccelFSR()`
+:   Gets the current accelerometer full-scale range.
+
+`unsigned short getLPF()`
+:   Gets the current low-pass filter frequency.
+
+`unsigned short getSampleRate()`
+:   Gets the current sample rate.
+
+`float getGyroSens()`
+:   Gets the gyroscope's sensitivity (conversion factor from raw value to dps).
+
+`unsigned short getAccelSens()`
+:   Gets the accelerometer's sensitivity (conversion factor from raw value to g's).
+
+`int setCompassSampleRate(unsigned short rate)`
+:   (MPU9250 only) Sets the magnetometer sample rate in Hz.
+
+`unsigned short getCompassSampleRate()`
+:   (MPU9250 only) Gets the magnetometer sample rate.
 
 ### DMP (Digital Motion Processor) Functions
 
-#### `dmpBegin`
+`int dmpBegin(unsigned short features, unsigned short fifoRate = 100)`
+:   Loads the DMP firmware and configures its features.
 
-This is the primary function to initialize and start the DMP. It loads the firmware, sets the desired features, registers internal callbacks for gestures, and enables the DMP.
+* features: A bitmask of DMP features to enable (e.g., DMP_FEATURE_6X_LP_QUAT).
+* fifoRate: The desired rate in Hz for the DMP to update the FIFO buffer.
+* Returns: INV_SUCCESS on success.
 
-```cpp
-int dmpBegin(unsigned short features, unsigned short fifoRate = 100);
-```
+`int dmpUpdateFifo()`
+:   Reads the latest data packet from the DMP FIFO and updates the public data members. This should be called frequently.
 
-* **Parameters:**
-  * `features` [in]: A bitmask of features to enable (e.g., `DMP_FEATURE_6X_LP_QUAT | DMP_FEATURE_SEND_RAW_ACCEL`).
-  * `fifoRate` [in]: The desired rate (in Hz) for the DMP to generate data packets. The maximum is 200Hz.
-* **Returns:** `INV_SUCCESS` on success.
+* Returns: INV_SUCCESS if a new packet was read.
 
-#### `dmpUpdateFifo`
+`int dmpSetFifoRate(unsigned short rate)`
+:   Sets the DMP FIFO update rate in Hz.
 
-Reads a single packet from the DMP FIFO and updates the class's public data members (`ax`, `ay`, `az`, `gx`, `gy`, `gz`, `qw`, `qx`, `qy`, `qz`, `time`). This should be called whenever an MPU interrupt is detected.
+`unsigned short dmpGetFifoRate()`
+:   Gets the current DMP FIFO update rate.
 
-```cpp
-int dmpUpdateFifo();
-```
+`unsigned long dmpGetPedometerSteps()`
+:   Gets the total steps counted by the DMP's pedometer.
 
-* **Returns:** `INV_SUCCESS` if a packet was successfully read.
+`int dmpSetPedometerSteps(unsigned long steps)`
+:   Sets the pedometer's internal step counter.
 
-#### `dmpSetOrientation`
+`int dmpSetTap(unsigned short xThresh, unsigned short yThresh, unsigned short zThresh, unsigned char taps)`
+:   Configures the DMP's tap detection feature.
 
-Sets the physical orientation of the sensor relative to the body frame. This is crucial for the DMP's sensor fusion algorithm.
+`bool tapAvailable()`
+:   Checks if a new tap has been detected.
 
-```cpp
-int dmpSetOrientation(const signed char *orientationMatrix);
-```
+`unsigned char getTapDir()`
+:   Gets the direction and axis of the last detected tap.
 
-* **Parameters:**
-  * `orientationMatrix` [in]: A 9-element array representing a 3x3 rotation matrix.
-* **Returns:** `INV_SUCCESS` on success.
+`unsigned char getTapCount()`
+:   Gets the count of the last detected tap event.
 
-### Gesture and Feature Functions
+`int dmpSetOrientation(const signed char *orientationMatrix)`
+:   Sets the DMP's orientation matrix.
 
-#### `dmpGetPedometerSteps`
+`unsigned char dmpGetOrientation()`
+:   Gets the orientation result from the DMP's Android-style orientation feature.
 
-Retrieves the current step count from the DMP's pedometer.
+### Data Conversion & Calculation
 
-```cpp
-unsigned long dmpGetPedometerSteps();
-```
+`float calcAccel(int axis_val)`
+:   Converts a raw accelerometer value to g's.
 
-* **Returns:** The total number of steps counted.
+`float calcGyro(int axis_val)`
+:   Converts a raw gyroscope value to degrees per second.
 
-#### `tapAvailable`
+`float calcQuat(long quat_val)`
+:   Converts a raw Q30 format quaternion value to a floating-point number.
 
-Checks if a tap gesture has been detected since the last time this function was called.
+`void computeEulerAngles(bool degrees = true)`
+:   Computes pitch, roll, and yaw from the current quaternion data, updating the public members.
 
-```cpp
-bool tapAvailable();
-```
+`float calcMag(int axis_val)`
+:   (MPU9250 only) Converts a raw magnetometer value to microteslas (uT).
 
-* **Returns:** `true` if a new tap is available, `false` otherwise. This flag is automatically reset after being read.
+`float computeCompassHeading()`
+:   (MPU9250 only) Computes the compass heading from raw magnetometer data.
 
-#### `getTapDir` / `getTapCount`
+## C-Compatible API (`MPU_DMP_C.h`)
 
-Retrieves the direction and number of taps for the last detected tap gesture.
+This is a procedural wrapper around the C++ class for use in C projects.
 
-```cpp
-unsigned char getTapDir();   // Returns direction (e.g., TAP_X_UP)
-unsigned char getTapCount(); // Returns number of consecutive taps
-```
+### Handle Management
 
-### Data Calculation & Conversion
+All C functions operate on an opaque pointer, `MPU_DMP_Handle`.
 
-#### `computeEulerAngles`
+`MPU_DMP_Handle MPU_DMP_Create()`
+:   Creates a new MPU_DMP instance and returns a handle to it.
 
-Calculates the pitch, roll, and yaw from the quaternion data stored in the public members. The results are stored in the `pitch`, `roll`, and `yaw` public members.
+`void MPU_DMP_Destroy(MPU_DMP_Handle handle)`
+:   Destroys an MPU_DMP instance and frees its memory.
 
-```cpp
-void computeEulerAngles(bool degrees = true);
-```
+### Function Reference
 
-* **Parameters:**
-  * `degrees` [in]: If `true` (default), the results are in degrees. If `false`, they are in radians.
+The C API provides functions that directly correspond to the methods in the C++ class. The C++ object's methods are mapped to C functions by replacing `object.method(args)` with `MPU_DMP_method(handle, args)`.
 
-#### `calcAccel` / `calcGyro` / `calcQuat`
+**Example:**
 
-**Converts raw sensor or quaternion values from the public data members into standard engineering units.**
+* C++: `myMpu.begin()` becomes C: `MPU_DMP_begin(myMpuHandle)`
+* C++: `myMpu.setGyroFSR(2000)` becomes C: `MPU_DMP_setGyroFSR(myMpuHandle, 2000)`
 
-```cpp
-float calcAccel(int axis_val); // Raw to g's
-float calcGyro(int axis_val);  // Raw to degrees/sec
-float calcQuat(long quat_val); // Raw Q30 to float
-```
+Data Access:
 
-* **Parameters:**
-  * `axis_val` / `quat_val` [in]: A raw sensor value (e.g., `ax`, `gy`, `qw`).
-* **Returns:** The converted floating-point value.
+Since C cannot directly access the C++ object's public members, getter functions are provided for all public data members.
 
-## 4. Typical Usage Workflow (C++)
+**Example:**
 
-1. Instantiate the Class:
+* To get the raw accelerometer X value: `int ax = MPU_DMP_get_ax(myMpuHandle);`
+* To get the calculated pitch: `float pitch = MPU_DMP_get_pitch(myMpuHandle);`
 
-    ```cpp
-    MPU9250_DMP myIMU;
-    ```
-
-2. Initialize the Hardware:
-
-    ```cpp
-    if (myIMU.begin() != INV_SUCCESS) {
-        // Handle error
-    }
-    ```
-
-3. Initialize and Start the DMP:
-
-    ```cpp
-    unsigned short dmpFeatures = DMP_FEATURE_6X_LP_QUAT | DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_TAP;
-    if (myIMU.dmpBegin(dmpFeatures, 100) != INV_SUCCESS) { // 100 Hz rate
-        // Handle error
-    }
-    ```
-
-4. Main Loop (Interrupt-Driven):
-
-    ```cpp
-    while (1) {
-        // Wait for MPU interrupt signal
-        if (myIMU.dmpUpdateFifo() == INV_SUCCESS) {
-            // New data is available in public members
-            myIMU.computeEulerAngles();
-            // Now use myIMU.roll, myIMU.pitch, myIMU.yaw, etc.
-        }
-        if (myIMU.tapAvailable()) {
-            // A tap was detected!
-            unsigned char count = myIMU.getTapCount();
-            unsigned char dir = myIMU.getTapDir();
-        }
-    }
-    ```
+Please refer to the `MPU_DMP_C.h` header for a complete list of all C functions, as they are a direct mapping of the C++ methods and data getters described above.
