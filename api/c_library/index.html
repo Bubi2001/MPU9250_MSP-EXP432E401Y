@@ -1,0 +1,1218 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A comprehensive C/C++ driver for the MPU-9250 on the TI-RTOS platform.">
+      
+      
+      
+      
+        <link rel="prev" href="../..">
+      
+      
+        <link rel="next" href="../cpp_class/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.18">
+    
+    
+      
+        <title>Base C Library - MPU-9250 TI-RTOS Driver</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.7e37652d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#mpu9250-imu-sensor-driver-api-reference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="MPU-9250 TI-RTOS Driver" class="md-header__button md-logo" aria-label="MPU-9250 TI-RTOS Driver" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            MPU-9250 TI-RTOS Driver
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Base C Library
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="light-blue"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="MPU-9250 TI-RTOS Driver" class="md-nav__button md-logo" aria-label="MPU-9250 TI-RTOS Driver" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    MPU-9250 TI-RTOS Driver
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    API Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            API Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Base C Library
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Base C Library
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-data-structures" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Data Structures
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Data Structures">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vector3d" class="md-nav__link">
+    <span class="md-ellipsis">
+      Vector3D
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#eulerangles" class="md-nav__link">
+    <span class="md-ellipsis">
+      EulerAngles
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#imudata" class="md-nav__link">
+    <span class="md-ellipsis">
+      IMUData
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-constants-and-macros" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Constants and Macros
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Constants and Macros">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#device-and-communication" class="md-nav__link">
+    <span class="md-ellipsis">
+      Device and Communication
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#physical-constants" class="md-nav__link">
+    <span class="md-ellipsis">
+      Physical Constants
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#register-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      Register Map
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-function-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Function Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Function Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#power-and-reset-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Power and Reset Functions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Power and Reset Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pwrimu" class="md-nav__link">
+    <span class="md-ellipsis">
+      PWRIMU
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rstimu" class="md-nav__link">
+    <span class="md-ellipsis">
+      RSTIMU
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Core Functions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mpu9250_init" class="md-nav__link">
+    <span class="md-ellipsis">
+      MPU9250_init
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#i2c-communication-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      I2C Communication Functions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="I2C Communication Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mpu9250_writereg" class="md-nav__link">
+    <span class="md-ellipsis">
+      MPU9250_writeReg
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mpu9250_readreg" class="md-nav__link">
+    <span class="md-ellipsis">
+      MPU9250_readReg
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mpu9250_readacctempgyr" class="md-nav__link">
+    <span class="md-ellipsis">
+      MPU9250_readAccTempGyr
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-processing-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Processing Functions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Processing Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mpu9250_unitconversion" class="md-nav__link">
+    <span class="md-ellipsis">
+      MPU9250_unitConversion
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mpu9250_calculateangle" class="md-nav__link">
+    <span class="md-ellipsis">
+      MPU9250_calculateAngle
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cpp_class/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    C++ DMP Class
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-data-structures" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Data Structures
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Data Structures">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vector3d" class="md-nav__link">
+    <span class="md-ellipsis">
+      Vector3D
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#eulerangles" class="md-nav__link">
+    <span class="md-ellipsis">
+      EulerAngles
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#imudata" class="md-nav__link">
+    <span class="md-ellipsis">
+      IMUData
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-constants-and-macros" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Constants and Macros
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Constants and Macros">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#device-and-communication" class="md-nav__link">
+    <span class="md-ellipsis">
+      Device and Communication
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#physical-constants" class="md-nav__link">
+    <span class="md-ellipsis">
+      Physical Constants
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#register-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      Register Map
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-function-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Function Reference
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Function Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#power-and-reset-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Power and Reset Functions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Power and Reset Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pwrimu" class="md-nav__link">
+    <span class="md-ellipsis">
+      PWRIMU
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rstimu" class="md-nav__link">
+    <span class="md-ellipsis">
+      RSTIMU
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Core Functions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mpu9250_init" class="md-nav__link">
+    <span class="md-ellipsis">
+      MPU9250_init
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#i2c-communication-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      I2C Communication Functions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="I2C Communication Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mpu9250_writereg" class="md-nav__link">
+    <span class="md-ellipsis">
+      MPU9250_writeReg
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mpu9250_readreg" class="md-nav__link">
+    <span class="md-ellipsis">
+      MPU9250_readReg
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mpu9250_readacctempgyr" class="md-nav__link">
+    <span class="md-ellipsis">
+      MPU9250_readAccTempGyr
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-processing-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Processing Functions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Processing Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mpu9250_unitconversion" class="md-nav__link">
+    <span class="md-ellipsis">
+      MPU9250_unitConversion
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mpu9250_calculateangle" class="md-nav__link">
+    <span class="md-ellipsis">
+      MPU9250_calculateAngle
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="mpu9250-imu-sensor-driver-api-reference">MPU9250 IMU Sensor Driver API Reference</h1>
+<h2 id="1-overview">1. Overview</h2>
+<p>This document provides the API reference for the MPU9250 IMU sensor driver. The library is designed to run on an <strong>MSP-EXP432E401Y</strong> development board within the <strong>TI-RTOS</strong> environment. It facilitates communication with the MPU9250 via I2C, providing functions for initialization, configuration, data acquisition, and processing.</p>
+<p><strong>Hardware Dependencies:</strong></p>
+<ul>
+<li>An I2C peripheral for communication.</li>
+<li>A GPIO pin to control the power supply to the MPU9250.</li>
+</ul>
+<p><strong>Software Dependencies:</strong></p>
+<ul>
+<li>TI-RTOS Kernel (<code>Task</code>, <code>System</code>)</li>
+<li>TI Drivers (<code>I2C</code>, <code>GPIO</code>)</li>
+</ul>
+<h2 id="2-data-structures">2. Data Structures</h2>
+<p>The library defines several structures to organize sensor data.</p>
+<h3 id="vector3d"><code>Vector3D</code></h3>
+<p>Represents a 3-dimensional vector, used for accelerometer and gyroscope data.</p>
+<pre><code class="language-c">typedef struct Vector3D {
+    float x;    // X-component
+    float y;    // Y-component
+    float z;    // Z-component
+} Vector3D;
+</code></pre>
+<ul>
+<li><strong>Members:</strong></li>
+<li><code>x</code>: <code>float</code> - The value on the X-axis.</li>
+<li><code>y</code>: <code>float</code> - The value on the Y-axis.</li>
+<li><code>z</code>: <code>float</code> - The value on the Z-axis.</li>
+</ul>
+<h3 id="eulerangles"><code>EulerAngles</code></h3>
+<p>Represents the orientation of the sensor in terms of roll, pitch, and yaw.</p>
+<pre><code class="language-c">typedef struct EulerAngles {
+    float pitch;    // Rotation around the Y-axis
+    float roll;     // Rotation around the X-axis
+    float yaw;      // Rotation around the Z-axis
+} EulerAngles;
+</code></pre>
+<ul>
+<li><strong>Members:</strong></li>
+<li><code>pitch</code>: <code>float</code> - The pitch angle in degrees.</li>
+<li><code>roll</code>: <code>float</code> - The roll angle in degrees.</li>
+<li><code>yaw</code>: <code>float</code> - The yaw angle in degrees.</li>
+</ul>
+<h3 id="imudata"><code>IMUData</code></h3>
+<p>A container structure that holds all processed data from the IMU.</p>
+<pre><code class="language-c">typedef struct IMUData {
+    Vector3D accelerometer; // Acceleration vector in m/s^2
+    Vector3D gyroscope;     // Angular velocity vector in rad/s
+    float temperature;      // Temperature reading in Celsius
+} IMUData;
+</code></pre>
+<ul>
+<li><strong>Members:</strong></li>
+<li><code>accelerometer</code>: <code>Vector3D</code> - Stores the acceleration data in m/s².</li>
+<li><code>gyroscope</code>: <code>Vector3D</code> - Stores the angular velocity data in rad/s.</li>
+<li><code>temperature</code>: <code>float</code> - Stores the sensor's internal temperature in degrees Celsius.</li>
+</ul>
+<h2 id="3-constants-and-macros">3. Constants and Macros</h2>
+<h3 id="device-and-communication">Device and Communication</h3>
+<ul>
+<li><code>MPU9250_I2C_ADDR</code>: <code>0x68</code> - The I2C slave address of the MPU9250.</li>
+<li><code>MPU9250_WHO_AM_I</code>: <code>0x70</code> - The expected value of the WHO_AM_I register (for MPU-9250, this can also be <code>0x71</code> or <code>0x73</code> depending on the version, but the code expects <code>0x70</code>).</li>
+</ul>
+<h3 id="physical-constants">Physical Constants</h3>
+<ul>
+<li><code>G_MPS2</code>: <code>9.80665f</code> - Standard gravity in meters per second squared.</li>
+<li><code>RAD_TO_DEG</code>: <code>57.2957795f</code> - Conversion factor from radians to degrees.</li>
+<li><code>DEG_TO_RAD</code>: <code>1.0f / RAD_TO_DEG</code> - Conversion factor from degrees to radians.</li>
+</ul>
+<h3 id="register-map">Register Map</h3>
+<p>The header file <code>MPU9250.h</code> contains a complete list of register address macros from <code>0x00</code> to <code>0x7E</code>. Key registers used in the driver include:</p>
+<ul>
+<li><code>MPU9250_CONFIG_ADDR</code>: <code>0x1A</code></li>
+<li><code>MPU9250_GYRO_CONFIG_ADDR</code>: <code>0x1B</code></li>
+<li><code>MPU9250_ACCEL_CONFIG_ADDR</code>: <code>0x1C</code></li>
+<li><code>MPU9250_ACCEL_CONFIG_2_ADDR</code>: <code>0x1D</code></li>
+<li><code>MPU9250_ACCEL_XOUT_H_ADDR</code>: <code>0x3B</code> (Start of sensor data block)</li>
+<li><code>MPU9250_PWR_MGMT_1_ADDR</code>: <code>0x6B</code></li>
+<li><code>MPU9250_WHO_AM_I_ADDR</code>: <code>0x75</code></li>
+</ul>
+<h2 id="4-function-reference">4. Function Reference</h2>
+<h3 id="power-and-reset-functions">Power and Reset Functions</h3>
+<h4 id="pwrimu"><code>PWRIMU</code></h4>
+<p>Controls the power supply to the MPU9250 via a GPIO pin.</p>
+<pre><code class="language-c">void PWRIMU(bool pwr);
+</code></pre>
+<ul>
+<li><strong>Description:</strong> Sets the state of the <code>PWR_MPU9250</code> GPIO pin. This function is intended to be connected to the VDD input of the sensor.</li>
+<li><strong>Parameters:</strong></li>
+<li><code>pwr</code> [in]: <code>bool</code> - The desired power state. <code>true</code> for ON, <code>false</code> for OFF.</li>
+</ul>
+<h4 id="rstimu"><code>RSTIMU</code></h4>
+<p>Performs a hardware reset of the MPU9250 by power cycling it.</p>
+<pre><code class="language-c">void RSTIMU(void);
+</code></pre>
+<ul>
+<li><strong>Description:</strong> This function calls <code>PWRIMU(false)</code> followed by <code>PWRIMU(true)</code> to cycle the power to the sensor, effectively resetting it. It also prints a reset message to the system console.</li>
+</ul>
+<h3 id="core-functions">Core Functions</h3>
+<h4 id="mpu9250_init"><code>MPU9250_init</code></h4>
+<p>Initializes the MPU9250 sensor with a predefined configuration.</p>
+<pre><code class="language-c">void MPU9250_init(I2C_Handle i2c, I2C_Transaction *i2cTransaction, IMUData *IMU_Handle);
+</code></pre>
+<ul>
+<li><strong>Description:</strong> This is the primary initialization function. It performs the following sequence:</li>
+<li>Resets the <code>IMU_Handle</code> data structure to zero.</li>
+<li>Performs a hardware reset using <code>RSTIMU()</code>.</li>
+<li>Performs a software reset and selects the best available clock source.</li>
+<li>Verifies the device identity by reading the <code>WHO_AM_I</code> register.</li>
+<li>Configures the gyroscope range to <code>±500 dps</code>.</li>
+<li>Configures the accelerometer range to <code>±2g</code>.</li>
+<li>Sets the Digital Low-Pass Filter (DLPF) for both accelerometer and gyroscope.</li>
+<li>Enables the FIFO for sensor data.</li>
+<li><strong>Parameters:</strong></li>
+<li><code>i2c</code> [in]: <code>I2C_Handle</code> - The handle to the configured I2C peripheral.</li>
+<li><code>i2cTransaction</code> [in, out]: <code>I2C_Transaction *</code> - A pointer to an I2C transaction structure used for all I2C communications.</li>
+<li><code>IMU_Handle</code> [out]: <code>IMUData *</code> - A pointer to the main IMU data structure to be cleared.</li>
+<li><strong>Note:</strong> The system will halt execution (<code>while(1);</code>) if the <code>WHO_AM_I</code> check fails or if any I2C transfer results in an error.</li>
+</ul>
+<h3 id="i2c-communication-functions">I2C Communication Functions</h3>
+<h4 id="mpu9250_writereg"><code>MPU9250_writeReg</code></h4>
+<p>Writes a single byte to a specified register.</p>
+<pre><code class="language-c">void MPU9250_writeReg(I2C_Handle i2c, I2C_Transaction *i2cTransaction, uint8_t reg_addr, uint8_t dataTx);
+</code></pre>
+<ul>
+<li><strong>Parameters:</strong></li>
+<li><code>i2c</code> [in]: <code>I2C_Handle</code> - The handle to the I2C peripheral.</li>
+<li><code>i2cTransaction</code> [in, out]: <code>I2C_Transaction *</code> - Pointer to the I2C transaction structure.</li>
+<li><code>reg_addr</code> [in]: <code>uint8_t</code> - The address of the register to write to.</li>
+<li><code>dataTx</code> [in]: <code>uint8_t</code> - The data byte to write.</li>
+<li><strong>Note:</strong> Halts the system on I2C transfer failure.</li>
+</ul>
+<h4 id="mpu9250_readreg"><code>MPU9250_readReg</code></h4>
+<p>Reads a single byte from a specified register.</p>
+<pre><code class="language-c">void MPU9250_readReg(I2C_Handle i2c, I2C_Transaction *i2cTransaction, uint8_t reg_addr, uint8_t *dataRx);
+</code></pre>
+<ul>
+<li><strong>Parameters:</strong></li>
+<li><code>i2c</code> [in]: <code>I2C_Handle</code> - The handle to the I2C peripheral.</li>
+<li><code>i2cTransaction</code> [in, out]: <code>I2C_Transaction *</code> - Pointer to the I2C transaction structure.</li>
+<li><code>reg_addr</code> [in]: <code>uint8_t</code> - The address of the register to read from.</li>
+<li><code>dataRx</code> [out]: <code>uint8_t *</code> - A pointer to a variable where the read data will be stored.</li>
+<li><strong>Note:</strong> Halts the system on I2C transfer failure.</li>
+</ul>
+<h4 id="mpu9250_readacctempgyr"><code>MPU9250_readAccTempGyr</code></h4>
+<p>Reads all sensor data (accelerometer, temperature, gyroscope) in a single burst read.</p>
+<pre><code class="language-c">void MPU9250_readAccTempGyr(I2C_Handle i2c, I2C_Transaction *i2cTransaction, uint8_t *dataRx);
+</code></pre>
+<ul>
+<li><strong>Description:</strong> Performs a 14-byte I2C burst read starting from <code>MPU9250_ACCEL_XOUT_H_ADDR</code>. This is the most efficient way to get a complete snapshot of the sensor data.</li>
+<li><strong>Parameters:</strong></li>
+<li><code>i2c</code> [in]: <code>I2C_Handle</code> - The handle to the I2C peripheral.</li>
+<li><code>i2cTransaction</code> [in, out]: <code>I2C_Transaction *</code> - Pointer to the I2C transaction structure.</li>
+<li><code>dataRx</code> [out]: <code>uint8_t *</code> - A pointer to a buffer of at least 14 bytes to store the raw sensor data.</li>
+<li><strong>Data Order:</strong> The data is read in the following order: <code>AX_H, AX_L, AY_H, AY_L, AZ_H, AZ_L, T_H, T_L, GX_H, GX_L, GY_H, GY_L, GZ_H, GZ_L</code>.</li>
+<li><strong>Note:</strong> Halts the system on I2C transfer failure.</li>
+</ul>
+<h3 id="data-processing-functions">Data Processing Functions</h3>
+<h4 id="mpu9250_unitconversion"><code>MPU9250_unitConversion</code></h4>
+<p>Converts the raw 14-byte sensor data into engineering units (m/s², °C, rad/s) and applies bias correction.</p>
+<pre><code class="language-c">void MPU9250_unitConversion(uint8_t *raw, IMUData *IMU_Handle, Vector3D accelBias, Vector3D gyroBias);
+</code></pre>
+<ul>
+<li><strong>Description:</strong></li>
+<li>Combines the high and low bytes for each sensor axis into 16-bit signed integers.</li>
+<li>Subtracts the provided bias values (in LSB) from the raw accelerometer and gyroscope readings.</li>
+<li>Converts the corrected accelerometer values to <code>m/s²</code>.</li>
+<li>Converts the raw temperature value to <code>ºC</code>.</li>
+<li>Converts the corrected gyroscope values to <code>rad/s</code>.</li>
+<li><strong>Parameters:</strong></li>
+<li><code>raw</code> [in]: <code>uint8_t *</code> - Pointer to the 14-byte buffer of raw sensor data.</li>
+<li><code>IMU_Handle</code> [out]: <code>IMUData *</code> - Pointer to the structure where the converted data will be stored.</li>
+<li><code>accelBias</code> [in]: <code>Vector3D</code> - A structure containing the accelerometer bias offsets (in LSB) for X, Y, and Z axes.</li>
+<li><code>gyroBias</code> [in]: <code>Vector3D</code> - A structure containing the gyroscope bias offsets (in LSB) for X, Y, and Z axes.</li>
+</ul>
+<h4 id="mpu9250_calculateangle"><code>MPU9250_calculateAngle</code></h4>
+<p>Calculates roll, pitch, and yaw angles from IMU data using a complementary filter.</p>
+<pre><code class="language-c">void MPU9250_calculateAngle(IMUData *IMU_Handle, EulerAngles *anglesDegrees, float dt, float cf_alpha, float dlpf_alpha);
+</code></pre>
+<ul>
+<li><strong>Description:</strong> Fuses accelerometer and gyroscope data to provide a stable orientation estimate.</li>
+<li>Applies a digital low-pass filter to the gyroscope readings to reduce noise.</li>
+<li>Calculates "long-term" roll and pitch from the accelerometer.</li>
+<li>Integrates gyroscope data to get "short-term" changes in orientation.</li>
+<li>Combines these two estimates using a complementary filter for stable roll and pitch.</li>
+<li>Yaw is calculated by integrating the Z-axis gyroscope data only.</li>
+<li><strong>Parameters:</strong></li>
+<li><code>IMU_Handle</code> [in]: <code>IMUData *</code> - Pointer to the struct with the latest sensor readings.</li>
+<li><code>anglesDegrees</code> [in, out]: <code>EulerAngles *</code> - Pointer to the struct where the calculated angles (in degrees) will be stored. The previous values are used for integration.</li>
+<li><code>dt</code> [in]: <code>float</code> - The time delta in seconds since the last call (the sampling period).</li>
+<li><code>cf_alpha</code> [in]: <code>float</code> - The complementary filter coefficient (e.g., 0.98). A higher value trusts the gyroscope more.</li>
+<li><code>dlpf_alpha</code> [in]: <code>float</code> - The digital low-pass filter coefficient for the gyroscope. A smaller value provides more smoothing.</li>
+<li><strong>Note:</strong> The yaw angle is not corrected by an absolute reference (like a magnetometer) and will drift over time.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.top"], "search": "../../assets/javascripts/workers/search.973d3a69.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.92b07e13.min.js"></script>
+      
+    
+  </body>
+</html>
